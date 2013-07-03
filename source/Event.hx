@@ -9,14 +9,15 @@ class Event extends FlxSprite {
     public var properties:Map<String, String>;
     public var gid:Int;
     public var state:Int;
+    public var action:String;
+    public var method:String;
+    public var repeat:Bool;
 
     override private function new(x, y, o) {
 
         gid = o.gid;
         
-        //MjE.switchProperties(this, o.custom.data);
-        properties = o.custom.data;
-        tag = Std.parseInt(properties["tag"]);
+        MjE.switchProperties(this, o.custom.data);
         
         active = false;
         alive = false;

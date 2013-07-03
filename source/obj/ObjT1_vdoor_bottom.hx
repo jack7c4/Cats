@@ -69,7 +69,7 @@ class ObjT1_vdoor_bottom extends Event {
         play("open");
         state = STATE_OPEN;
 
-        if (properties["repeat"]=="1") {
+        if (repeat) {
 
             var delay = new FlxTimer();
             delay.start(5, 1, function (a:FlxTimer) { reset(x, y); });
