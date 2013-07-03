@@ -77,19 +77,7 @@ class MjE {
 		}
 	}
 
-	static public function switchProperties(o:Dynamic, ps:Map<String, String>) {
-
-		for (k in ps.keys()) {
-
-			switch (k) {
-
-				case "tag": 	o.tag = Std.parseInt(ps[k]);
-				case "action": 	o.action = ps[k];
-				case "method": 	o.method = ps[k];
-				case "repeat": 	o.repeat = (ps[k]=="true") ? true : false;
-				case "active": 	o.active = (ps[k]=="true") ? true : false;
-			}
-		}
+	static public function switchProperties(o:Dynamic, p:Map<String, String>) {
 
 	}
 }

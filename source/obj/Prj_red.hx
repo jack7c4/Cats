@@ -5,11 +5,11 @@ import org.flixel.*;
 import org.flixel.util.*;
 import tmx.*;
 
-class Prj_red extends Event {
+class Prj_red extends FlxSprite {
 
     override public function new(o:TmxObject):Void {
 
-    	super(o.x +6, o.y +6, o);
+    	super(o.x +6, o.y +6);
 
         loadGraphic("assets/sprites/prj_red.png");
 
