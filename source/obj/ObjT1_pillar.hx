@@ -4,7 +4,7 @@ import openfl.Assets;
 import org.flixel.*;
 import tmx.*;
 
-class ObjT1_pillar extends ObjMain {
+class ObjT1_pillar extends Event {
 
     override public function new(o:TmxObject):Void {
 
@@ -12,7 +12,7 @@ class ObjT1_pillar extends ObjMain {
 
         loadGraphic("assets/sprites/t1pillar.png", true, false, 16, 32);
 
-        if (gid==MjO.T1_PILLAR_GREEN) addAnimation("main", [0]);
+        if (gid==MjE.T1_PILLAR_GREEN) addAnimation("main", [0]);
         else addAnimation("main", [2]);
 
         play("main");

@@ -63,12 +63,12 @@ class MjG {
 
 	static public function getPlayer():Player {
 
-		return MjO.get_player();
+		return MjE.get_player();
 	}
 
 	static public function getPlayerMidpoint():FlxPoint {
 
-		return MjO.get_player().getMidpoint();
+		return MjE.get_player().getMidpoint();
 	}
 
 
@@ -205,10 +205,10 @@ class MjG {
 		if (o<=32) return null; // not applicable because it's an event, not an object
 		if (defaultTmxObj==null) setDefaultTmxObj();
 
-		defaultTmxObj.gid = o + MjO.TILESET_LENGTH;
+		defaultTmxObj.gid = o + MjE.TILESET_LENGTH;
 		defaultTmxObj.x = Std.int(x);
 		defaultTmxObj.y = Std.int(y);
-		MjO.switchObject(defaultTmxObj);
+		MjE.switchObject(defaultTmxObj);
 
 		MjG.initialiseObjects(); // add it to flixel group AND MjG
 		return MjG.getLastObject();
@@ -216,7 +216,7 @@ class MjG {
 
 	static public function activateEvents(tag:Int, state:Int = 0):Void {
 
-		for (e in events) if (e.tag==tag && e.gid!=MjO.TRIGGER && e.gid!=MjO.PLAYER_EXIT) e.activate(state);
+		for (e in events) if (e.tag==tag && e.gid!=MjE.TRIGGER && e.gid!=MjE.PLAYER_EXIT) e.activate(state);
 		for (o in objects) if (o.tag==tag) o.activate(state);
 	}
 

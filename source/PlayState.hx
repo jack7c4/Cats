@@ -58,7 +58,7 @@ class PlayState extends FlxState {
 		// Add events (and objects) to Flixel groups
 
 		var objectsEvents:TmxObjectGroup = gameMapTmx.getObjectGroup("events");
-		for (o in objectsEvents.objects) MjO.switchObject(o);
+		for (o in objectsEvents.objects) MjE.switchObject(o);
 
 
 		// Prepare events and objects in MjG
@@ -66,9 +66,9 @@ class PlayState extends FlxState {
 		MjG.initialise();
 
 
-		// Reference player from MjO
+		// Reference player from MjE
 
-		player = MjO.get_player();
+		player = MjE.get_player();
 
 
 		// Add groups to map
@@ -115,7 +115,7 @@ class PlayState extends FlxState {
 
 	private function collidePlayerEvents(a:Player, b:Dynamic):Void {
 
-		if (b.gid!=MjO.TRIGGER && b.gid!=MjO.PLAYER_EXIT) return;
+		if (b.gid!=MjE.TRIGGER && b.gid!=MjE.PLAYER_EXIT) return;
 		if (!b.active) return;
 
 		b.activate();

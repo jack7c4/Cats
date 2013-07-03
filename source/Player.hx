@@ -4,7 +4,7 @@ import org.flixel.*;
 import tmx.*;
 import obj.*;
 
-class Player extends ObjMain {
+class Player extends Event {
 
     public var freeze:Bool = false;
 

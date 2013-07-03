@@ -1,10 +1,10 @@
-package map;
+package;
 
 import openfl.Assets;
 import org.flixel.*;
 import tmx.*;
 
-class MapTarget extends MapEvent {
+class Target extends Event {
 
 	override public function new(o:TmxObject):Void {
 

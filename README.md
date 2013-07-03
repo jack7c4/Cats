@@ -10,4 +10,4 @@ Objectives
 
 Contact
 -------
-Please find contact details at [http://jack.kingbrick.co.uk/]
+This project is managed by [Jack Gutteridge](http://jack.kingbrick.co.uk/)

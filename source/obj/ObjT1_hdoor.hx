@@ -4,7 +4,7 @@ import openfl.Assets;
 import org.flixel.*;
 import tmx.*;
 
-class ObjT1_hdoor extends ObjMain {
+class ObjT1_hdoor extends Event {
 
     override public function new(o:TmxObject):Void {
 

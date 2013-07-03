@@ -1,18 +1,18 @@
-package map;
+package;
 
 import openfl.Assets;
 import org.flixel.*;
 import org.flixel.util.*;
 import tmx.*;
 
-class MapTrigger extends MapEvent {
+class Trigger extends Event {
 
 	override public function new(o:TmxObject):Void {
 
         super(o.x, o.y-16, o);
 
         if (properties["active"]=="0") active = false; // effectivly being hijacked from Flixel's collide checks
-        if (gid == MjO.PLAYER_EXIT) name = "exit";
+        if (gid == MjE.PLAYER_EXIT) name = "exit";
 
         makeGraphic(16, 16, 0x88880000);
 	}

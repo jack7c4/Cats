@@ -1,11 +1,10 @@
 package;
 
 import org.flixel.*;
-import map.*;
 import obj.*;
 import tmx.*;
 
-class MjO {
+class MjE {
 
     static inline public var TILESET_LENGTH = 48;
 
@@ -27,6 +26,11 @@ class MjO {
 
     static private var player:Player;
 
+	static public function get_player():Player {
+
+		return player;
+	}
+
 	static public function switchObject(o:TmxObject):Void {
 
 		o.gid -= TILESET_LENGTH;
@@ -41,12 +45,12 @@ class MjO {
 				gameObjects.add(player);
 
 			case TRIGGER, PLAYER_EXIT:
-				gameEvents.add(new MapTrigger(o));
+				gameEvents.add(new Trigger(o));
 
 
 
 			case TARGET, PATROL_POINT:
-				gameEvents.add(new MapTarget(o));
+				gameEvents.add(new Target(o));
 
 
 
@@ -73,8 +77,7 @@ class MjO {
 		}
 	}
 
-	static public function get_player():Player {
+	static public function switchProperties(o:Dynamic, p:Map<String, String>) {
 
-		return player;
 	}
 }

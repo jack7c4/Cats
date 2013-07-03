@@ -5,7 +5,7 @@ import org.flixel.*;
 import org.flixel.util.*;
 import tmx.*;
 
-class ObjT1_vdoor_bottom extends ObjMain {
+class ObjT1_vdoor_bottom extends Event {
 
     static inline public var STATE_OPEN     = 1;
     static inline public var STATE_CLOSE    = 2;

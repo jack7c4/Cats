@@ -1,11 +1,25 @@
-package obj.ai;
+package;
 
 import org.flixel.*;
 import org.flixel.util.*;
 import tmx.*;
-import map.*;
 
-class Ai extends ObjMain {
+class Frame {
+
+    public var animation:String;
+    public var duration:Int;
+    public var action:Void -> Void;
+
+    public function new(animation:String, duration:Int, action:Void -> Void):Void {
+
+        this.animation = animation;
+        this.duration = duration;
+        this.action = action;
+    }
+
+}
+
+class Actor extends Event {
 
     public static inline var IDLE:Int 		= 2;
     public static inline var SEEK:Int 		= 3;
@@ -173,7 +187,7 @@ class Ai extends ObjMain {
 
     function shoot_attack():Void {
 
-        var bullet = MjG.spawnObject(MjO.PRJ_RED, this.x, this.y);
+        var bullet = MjG.spawnObject(MjE.PRJ_RED, this.x, this.y);
         //trace(bullet);
         bullet.velocity = MjG.calculateVelocity(this.getMidpoint(), shoot_target, 320);
     }

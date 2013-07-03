@@ -3,9 +3,8 @@ package obj;
 import openfl.Assets;
 import org.flixel.*;
 import tmx.*;
-import obj.ai.*;
 
-class ObjS1_kbot extends Ai {
+class ObjS1_kbot extends Actor {
 
     override public function new(o:TmxObject):Void {
 
