@@ -9,7 +9,7 @@ class MjM {
     // yes, its name is a tribute to ZDooM
 
 
-    static public var currentScene:Int = 44;
+    static public var currentScene:Int = 1;
  	static public var currentMap:Int = 1;
 
     static private var counter:Int;
