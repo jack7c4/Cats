@@ -20,7 +20,7 @@ class Target extends Event {
 
 		if (!active) return;
 		
-		if (properties["action"]=="switch") MjG.switchTile(getMidpoint(), 1);
+		if (action=="switch") MjG.switchTile(getMidpoint(), 1);
 
 		kill();
 	}
