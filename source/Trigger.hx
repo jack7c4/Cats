@@ -11,7 +11,6 @@ class Trigger extends Event {
 
         super(o.x, o.y-16, o);
 
-        if (properties["active"]=="0") active = false; // effectivly being hijacked from Flixel's collide checks
         if (gid == MjE.PLAYER_EXIT) name = "exit";
 
         makeGraphic(16, 16, 0x88880000);
@@ -19,7 +18,7 @@ class Trigger extends Event {
 
 	public function reset_event():Void {
 
-		switch (properties["method"]) {
+		switch (method) {
 
 			case "switch":
 				MjG.switchTileBack(getMidpoint());
@@ -37,13 +36,13 @@ class Trigger extends Event {
 
 		if (name=="exit") MjM.nextLevel();
 
-		switch (properties["method"]) {
+		switch (method) {
 
 			case "switch":
 				MjG.switchTile(getMidpoint());
 		}
 
-		if (properties["action"]=="script") MjM.activateEvents(tag);
+		if (action=="script") MjM.activateEvents(tag);
 		else MjG.activateEvents(tag);
 
 		/*switch (properties["action"]) {
@@ -58,7 +57,7 @@ class Trigger extends Event {
 				//MjM.activateEvents(tag);
 		}*/
 
-		if (properties["repeat"]=="1") {
+		if (repeat==true) {
 
 			var delay = new FlxTimer();
 			delay.start(2.5, 1, function (a:FlxTimer) { reset_event; });
