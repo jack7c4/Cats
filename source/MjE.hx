@@ -92,4 +92,139 @@ class MjE {
 		}
 
 	}
+
+	static var ps:Bool = true;		// Parse Saftey, don't let script parse twice
+	static var pv:Int;	 			// Parse Level: filter, object, componant, property, value
+	static var pp:Int;				// Parse Pointer, counter for line
+	static var pl:Int;				// Parse Last, index of last entry
+	static var pa:Array<String>;	// Parse Array, of lines
+	static var ta:Actor;			// Temp Actor
+
+	static public function parseScript():Void {
+
+		if (ps) return;
+		ps = false;
+
+	    pa = openfl.Assets.getText('assets/actors/script.txt').split("\n");
+	    pl = pa.length -1;
+	
+		while (pp <= pl) {
+
+			//trace('pp: $pp; pl: $pl;');
+
+			if (pv==0) {					// Filter everything through parse_filterChar
+
+				var tl:String = "";			// Temp Line
+				var tc:String;				// Temp Char
+				var c:Int = 0;				// Counter
+				var l:Int = pa[pp].length;	// Last
+
+				while (c < l) {
+
+					tc = pa[pp].charAt(c);
+					if (parse_filterChar(tc)) tl += tc.toLowerCase();
+					c++;
+				}
+
+				if (pp == pl) {
+
+					pv++;
+					pp = 0;
+				}
+			}
+
+			else if (pa[pp]=="") null;		// Empty line, ignore
+
+			else if (pv==1) {				// Identify an object (actor, projectile, obstacle, decoration)
+
+				//trace("pv is one");
+
+				if (pa[pp+1].substr(0,3)=="---" && parse_objectAssert(pa[pp])) {
+
+					//ta = new Actor();
+				}
+				
+				else parse_error("Object definition not found: have you added hyphens under it?");
+			}
+
+
+			pp++;
+		}
+
+	}
+
+	static function parse_objectAssert(s:String):Bool {
+
+		if (s.substr(0,5) =="actor") 		return true;
+		if (s.substr(0,10)=="projectile") 	return true;
+		if (s.substr(0,8) =="obstacle") 	return true;
+		if (s.substr(0,10)=="decoration") 	return true;
+		return false;
+	}
+
+	static function parse_error(m:String):Void {
+
+		trace("SCRIPT ERROR:");
+		trace('[Line ${pp+1}] ' +m);
+		pp = 100;
+		pl = 0;
+	}
+
+	static function parse_filterChar(c:String):Bool {
+
+		var cc:Int = c.charCodeAt(0);
+
+		if (cc >= 65 && cc <= 122) 	return true;	// alphabet
+		if (cc >= 48 && cc <= 57) 	return true;	// numeric
+		if (cc == 45 || cc == 35) 	return true;	// hyphen or hash
+		if (cc == 58 || cc == 62) 	return true;	// colon or right arrow
+		if (cc == 44)				return true;	// comma ;TODO: 47, fslash for commenting
+		return false;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

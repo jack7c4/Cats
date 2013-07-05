@@ -6,7 +6,6 @@ class Event extends FlxSprite {
 
     public var name:String;
     public var tag:Int;
-    public var properties:Map<String, String>;
     public var gid:Int;
     public var state:Int;
     public var action:String;

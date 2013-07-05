@@ -28,6 +28,9 @@ class PlayState extends FlxState {
 		//FlxG.mouse.show();
 		#end
 
+		
+
+
 		// Prepare current game state
 
 		gameMap = new FlxTilemap();
@@ -35,9 +38,20 @@ class PlayState extends FlxState {
 		gameObjects = new FlxGroup();
 
 
+		
+		
 		// Prepare the onload list, so functions can be called after the playstate
-
+		
 		MjG.initialiseOnLoad();
+
+
+		
+
+		// Import and parse the decorate scripts
+		
+		MjE.parseScript();
+
+
 
 
 		// Read MjM for level information
@@ -55,10 +69,17 @@ class PlayState extends FlxState {
 		add(gameMap);
 
 
+		
+
+
+
+
 		// Add events (and objects) to Flixel groups
 
 		var objectsEvents:TmxObjectGroup = gameMapTmx.getObjectGroup("events");
 		for (o in objectsEvents.objects) MjE.switchObject(o);
+
+		
 
 
 		// Prepare events and objects in MjG
@@ -66,9 +87,15 @@ class PlayState extends FlxState {
 		MjG.initialise();
 
 
+
+
+
 		// Reference player from MjE
 
 		player = MjE.get_player();
+
+
+
 
 
 		// Add groups to map
@@ -78,10 +105,16 @@ class PlayState extends FlxState {
 		add(gameObjects);
 
 
+
+
+
 		// Add camera
 
 		FlxG.camera.setBounds(0, 0, gameMap.width, gameMap.height, true);
 		FlxG.camera.follow(player, FlxCamera.STYLE_TOPDOWN);
+
+
+
 
 
 		// Call blocked functions and run maps' intro script
