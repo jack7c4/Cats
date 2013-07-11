@@ -10,13 +10,6 @@ import obj.*;
 
 class PlayState extends FlxState {
 
-	private static var player:Player;
-
-	private static var gameMap:FlxTilemap;
-	private static var gameMapTmx:TmxMap;
-	private static var gameEvents:FlxGroup;
-	private static var gameObjects:FlxGroup;
-
 	override public function create():Void {
 
 		#if !neko
@@ -28,149 +21,25 @@ class PlayState extends FlxState {
 		//FlxG.mouse.show();
 		#end
 
-		
+		super.create();
 
-
-		// Prepare current game state
-
-		gameMap = new FlxTilemap();
-		gameEvents = new FlxGroup();
-		gameObjects = new FlxGroup();
-
-
-		
-		
-		// Prepare the onload list, so functions can be called after the playstate
-		
-		MjG.initialiseOnLoad();
-
-
-		
-
-		// Import and parse the decorate scripts
-		
-		MjE.parseScript();
-
-
-
-
-		// Read MjM for level information
-
-		MjM.initialise();
-
-		var cm:String = MjM.getCurrentMap();
-		var cs:String = MjM.getCurrentScene();
-		gameMapTmx = new TmxMap(openfl.Assets.getText('assets/maps/$cm.tmx'));
-
-		gameMap.loadMap(
-				gameMapTmx.getLayer('main').toCsv(gameMapTmx.getTileSet('main')),
-				'assets/maps/$cs-tiles.png', 16, 16, FlxTilemap.OFF, 0, 0, 24);
-
-		add(gameMap);
-
-
-		
-
-
-
-
-		// Add events (and objects) to Flixel groups
-
-		var objectsEvents:TmxObjectGroup = gameMapTmx.getObjectGroup("events");
-		for (o in objectsEvents.objects) MjE.switchObject(o);
-
-		
-
-
-		// Prepare events and objects in MjG
-
-		MjG.initialise();
-
-
-
-
-
-		// Reference player from MjE
-
-		player = MjE.get_player();
-
-
-
-
-
-		// Add groups to map
-
-		gameEvents.visible = false;
-		add(gameEvents);
-		add(gameObjects);
-
-
-
-
-
-		// Add camera
-
-		FlxG.camera.setBounds(0, 0, gameMap.width, gameMap.height, true);
-		FlxG.camera.follow(player, FlxCamera.STYLE_TOPDOWN);
-
-
-
-
-
-		// Call blocked functions and run maps' intro script
-
-		MjG.executeOnLoad();
-		MjM.startEvents();
-
-		// Null test
-		//var test = MjG.getEvents();
-		//for (t in test) if (true) trace(t.gid);
+		MjM.initialise();		// Map
+		MjE.initialise();		// Entities
+		MjG.initialise();		// Game
 	}
 	
-	override public function destroy():Void
-	{
+	override public function destroy():Void {
+
 		super.destroy();
 	}
 
 	override public function update():Void {
 
-		if (FlxG.keys.justPressed("ENTER")) 	MjM.restartLevel();
-		else if (FlxG.keys.justPressed("P")) 	MjM.nextLevel();
-		else if (FlxG.keys.justPressed("O")) 	MjM.prevLevel();
+		if (FlxG.keys.justPressed("ENTER")) 	MjM.level_restart();
+		else if (FlxG.keys.justPressed("P")) 	MjM.level_next();
+		else if (FlxG.keys.justPressed("O")) 	MjM.level_prev();
 
 		super.update();
-
-		MjG.sortZ(gameObjects);
-		FlxG.collide(gameObjects, gameMap);
-		FlxG.collide(player, gameObjects);
-		FlxG.overlap(player, gameEvents, collidePlayerEvents);
-	}
-
-	private function collidePlayerEvents(a:Player, b:Dynamic):Void {
-
-		if (b.gid!=MjE.TRIGGER && b.gid!=MjE.PLAYER_EXIT) return;
-		if (!b.active) return;
-
-		b.activate();
-	}
-
-	static public function get_gameMap():FlxTilemap {
-
-		return gameMap;
-	}
-
-	static public function get_gameMapTmx():TmxMap {
-
-		return gameMapTmx;
-	}
-
-	static public function get_gameEvents():FlxGroup {
-
-		return gameEvents;
-	}
-
-	static public function get_gameObjects():FlxGroup {
-
-		return gameObjects;
+		MjG.update();
 	}
 }

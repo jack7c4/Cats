@@ -1,77 +1,111 @@
-package; // not in map, because no idea
+package;
 
 import org.flixel.*;
 import org.flixel.util.*;
-import map.*;
-import obj.*;
+import tmx.*;
 
 class MjM {
-    // yes, its name is a tribute to ZDooM
+    // it's name was a tribute to ZDooM's MapInfo
 
 
-    static public var currentScene:Int = 44;
- 	static public var currentMap:Int = 1;
+    static public var scene_current:Int = 1;
+ 	static public var map_current:Int = 1;
+    static public var map_tmx:TmxMap;
+    static public var map_flx:FlxTilemap;
+    static public var map_events:TmxObjectGroup;
 
-    static private var counter:Int;
+    static private var script_counter:Int;
 
-    static public function initialise():Void { // called at end of playstate
+    static public function initialise():Void {
 
-    	//FlxG.log("Reading MapInfo...");
+        var fm:String = 'assets/maps/${map_fcurrent()}.tmx';            // File Map
+        var ft:String = 'assets/maps/${scene_fcurrent()}-tiles.png';    // File Tiles
 
-    	// Find out what level
-    	if (currentMap==0) currentMap = 1;
+        map_tmx = new TmxMap(openfl.Assets.getText(fm));
+        map_flx = new FlxTilemap();
 
-    	// Reset all variables
-    	counter = 0;
+        map_flx.loadMap(
+
+            map_tmx.getLayer('main').toCsv(map_tmx.getTileSet('main')),
+            ft,
+            16,
+            16,
+            FlxTilemap.OFF,
+            0,
+            0,
+            24
+        );
+
+        map_events = map_tmx.getObjectGroup("events");
     }
 
-    static public function nextLevel():Void {
+    static public function level_next():Void {
 
-        currentMap++;
-        restartLevel();
+        map_current++;
+        level_restart();
     }
 
-    static public function prevLevel():Void {
+    static public function level_prev():Void {
 
-        currentMap--;
-        restartLevel();
+        map_current--;
+        level_restart();
     }
 
-    static public function getCurrentScene():String {
+    static public function level_restart():Void {
 
-        if (currentScene==0 || currentScene==44) return 't1';
-
-        return 's${currentScene}';
+        FlxG.switchState(new PlayState());
     }
 
-    static public function getCurrentMap():String {
+    static public function scene_fcurrent():String {
 
-        if (currentScene==0) currentScene = 44;
-    	if (currentMap==0) currentMap = 1;
+        if (scene_current==0 || scene_current==44) return 't1';
 
-        if (currentScene==44) return 't1s${currentMap}';
-
-    	return 's${currentScene}m${currentMap}';
+        return 's${scene_current}';
     }
 
-    static public function restartLevel():Void {
+    static public function map_fcurrent():String {
 
-    	FlxG.switchState(new PlayState());
+        if (scene_current==0) scene_current = 44;
+    	if (map_current==0) map_current = 1;
+
+        if (scene_current==44) return 't1s${map_current}';
+
+    	return 's${scene_current}m${map_current}';
     }
 
-    static public function startEvents():Void {
+    static public function map_start():Void {
 
-       // if (currentMap==3) T1M3_start();
+        script_counter = 0;
+
+       // if (map_current==3) T1M3_start();
     }
 
-	static public function activateEvents(?tag:Int):Void {
+	static public function map_activate(?tag:Int):Void {
 
-		if (currentMap==1) T1M1_active();
-		if (currentMap==2) T1M2_active(tag);
+		if (map_current==1) T1M1_active();
+		if (map_current==2) T1M2_active(tag);
 	}
 
 
-    // Map scripts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // // // // // // // // //
+
+    //      Map scripts
+
+    //
 
     static private function T1M3_start():Void {
        
@@ -79,27 +113,27 @@ class MjM {
 
 	static private function T1M2_active(tag:Int):Void {
 
-        if (tag==21) MjG.activateEvents(11, 2);
+        if (tag==21) null;//MjG.activateEvents(11, 2);
 
-        if (tag==22) MjG.activateEvents(11, 1);
+        if (tag==22) null;//MjG.activateEvents(11, 1);
 
-        if (tag==1 && counter==0) {
+        if (tag==1 && script_counter==0) {
 
-            counter++;
-            MjG.getEventByTag(21).active = false;
-            MjG.getEventByTag(22).active = false;
-            MjG.activateEvents(11, 2);
-            MjG.activateEvents(12, 2);
+            script_counter++;
+            null;//MjG.getEventByTag(21).active = false;
+            null;//MjG.getEventByTag(22).active = false;
+            null;//MjG.activateEvents(11, 2);
+            null;//MjG.activateEvents(12, 2);
             var delay = new FlxTimer();
             delay.start(7, 1,
                 function (x) {
 
-                    MjG.getEventByTag(21).active = true;
-                    MjG.getEventByTag(22).active = true;
-                    MjG.getEventByTag(1).reset_event();
-                    MjG.activateEvents(11, 1);
-                    MjG.activateEvents(12, 1);
-                    counter--;
+                    null;//MjG.getEventByTag(21).active = true;
+                    null;//MjG.getEventByTag(22).active = true;
+                    null;//MjG.getEventByTag(1).reset_event();
+                    null;//MjG.activateEvents(11, 1);
+                    null;//MjG.activateEvents(12, 1);
+                    script_counter--;
                 }
             );
         }
@@ -107,11 +141,11 @@ class MjM {
 
 	static private function T1M1_active():Void {
 
-		counter++;
-		if (counter==2) {
+		script_counter++;
+		if (script_counter==2) {
 
-			MjG.activateEvents(3);
-            MjG.getEvent("exit").active = true;
+			null;//MjG.activateEvents(3);
+            null;//MjG.getEvent("exit").active = true;
 		}
 	}
 }

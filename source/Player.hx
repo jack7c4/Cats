@@ -4,16 +4,16 @@ import org.flixel.*;
 import tmx.*;
 import obj.*;
 
-class Player extends Event {
+class Player extends FlxSprite {
 
     public var freeze:Bool = false;
 
     private var speed_walk:Int = 60;
     private var speed_sprint:Int = 140;
 
-    override public function new(o:TmxObject) {
+    override public function new(x:Float, y:Float) {
 
-        super(o.x, o.y -16, o);
+        super(x, y);
 
         loadGraphic("assets/sprites/player.png", true, true, 28, 28);
         

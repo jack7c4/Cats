@@ -1,37 +1,38 @@
 package;
 
 import org.flixel.*;
+import tmx.TmxObject;
 
 class Event extends FlxSprite {
 
-    public var name:String;
     public var tag:Int;
     public var gid:Int;
-    public var state:Int;
     public var action:String;
     public var method:String;
     public var repeat:Bool;
+    public var state:Int;
 
-    override private function new(x, y, o) {
+    override public function new(x:Float, y:Float, gid:Int, ?ps:Map<String, String>):Void {
 
-        gid = o.gid;
+    	super(x, y);
+
+        this.gid = gid;
         
-        MjE.switchProperties(this, o.custom.data);
-        
-        active = false;
-        alive = false;
-        exists = false;
-        immovable = true;
+        properties_switch(ps);
+    } 
 
-        super(x, y);
-    }
+    private function properties_switch(ps:Map<String, String>):Void {
 
-    public function activate(state:Int = 0):Void {};
+        for (k in ps.keys()) {
 
-    override public function kill():Void {
-
-        alive = false;
-        exists = false;
-        active = false;
+            switch (k) {
+                
+                case "tag":     tag = Std.parseInt(ps[k]);
+                case "action":  action = ps[k];
+                case "method":  method = ps[k];
+                case "repeat":  repeat = (ps[k]=="true") ? true : false;
+                case "active":  active = (ps[k]=="true") ? true : false;
+            }
+        }
     }
 }

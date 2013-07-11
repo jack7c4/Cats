@@ -3,6 +3,9 @@
  * This content is released under the MIT License.
  * For questions mail me at adrien@revolugame.com
  ******************************************************************************/
+ 
+// This code has been heavily modified by me and I don't understand it http://jack.kingbrick.co.uk/
+
 package tmx;
 
 import flash.utils.ByteArray;

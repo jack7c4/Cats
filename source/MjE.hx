@@ -1,14 +1,13 @@
 package;
 
-import org.flixel.*;
-import obj.*;
-import tmx.*;
+import org.flixel.FlxTypedGroup;
+import tmx.TmxObject;
 
 class MjE {
 
     static inline public var TILESET_LENGTH = 48;
 
-    // Object definitions
+    // Entity GIDs
 
     static inline public var PLAYER_START       :Int = 3;
     static inline public var PLAYER_EXIT        :Int = 2;
@@ -16,6 +15,7 @@ class MjE {
     static inline public var TARGET             :Int = 18;
     static inline public var PATROL_POINT       :Int = 19;
     static inline public var STORY              :Int = 26;
+
     static inline public var T1_PILLAR_PURPLE   :Int = 33;
     static inline public var T1_PILLAR_GREEN    :Int = 34;
     static inline public var T1_VDOOR_PURPLE    :Int = 35;
@@ -24,95 +24,136 @@ class MjE {
     static inline public var T1_KBOT    		:Int = 42;
     static inline public var PRJ_RED    		:Int = 201;
 
-    static private var player:Player;
+    static public function initialise():Void {
 
-	static public function get_player():Player {
+    	parseScript("actors/script.txt");
 
-		return player;
-	}
+		players = new FlxTypedGroup<Player>();
+		actors 	= new FlxTypedGroup<Actor>();
+		events 	= new FlxTypedGroup<Event>();
 
-	static public function switchObject(o:TmxObject):Void {
+    	for (o in MjM.map_events.objects) e_switch(o);
+    }
+
+    static public var players:FlxTypedGroup<Player>;
+    static public var actors:FlxTypedGroup<Actor>;
+    static public var events:FlxTypedGroup<Event>;
+
+	static public function e_switch(o:TmxObject):Void {
 
 		o.gid -= TILESET_LENGTH;
 
-		var gameEvents:FlxGroup = PlayState.get_gameEvents();
-		var gameObjects:FlxGroup = PlayState.get_gameObjects();
+		var swi:Int; 	// swtich index
+		swi = 0;		// using an index with an eq value to check if escaped ceil bound
 
-		switch (o.gid) {
-			
-			case PLAYER_START:
-				player = new Player(o);
-				gameObjects.add(player);
+		while (swi <= sdi) {
 
-			case TRIGGER, PLAYER_EXIT:
-				gameEvents.add(new Trigger(o));
-
-
-
-			case TARGET, PATROL_POINT:
-				gameEvents.add(new Target(o));
-
-
-
-
-			case T1_PILLAR_GREEN, T1_PILLAR_PURPLE:
-				gameObjects.add(new ObjT1_pillar(o));
-
-			case T1_VDOOR_PURPLE:
-				gameObjects.add(new ObjT1_vdoor_top(o));
-				gameObjects.add(new ObjT1_vdoor_bottom(o));
-
-			case T1_HDOOR_GREEN:
-				gameObjects.add(new ObjT1_hdoor(o));
-
-			case T1_KGUIDE:
-				gameObjects.add(new ObjS1_kbot(o));
-
-			case T1_KBOT:
-				gameObjects.add(new ObjT1_kbot(o));
-
-
-			case PRJ_RED:
-				gameObjects.add(new Prj_red(o));
+			if (o.gid == s_gids[swi]) break;
+			swi++;
 		}
-	}
 
-	static public function switchProperties(o:Dynamic, ps:Map<String, String>) {
+		if (swi <= sdi) {
 
-		for (k in ps.keys()) {
+			switch (s_ets[swi]) {
 
-			switch (k) {
-
-				case "tag": 	o.tag = Std.parseInt(ps[k]);
-				case "action": 	o.action = ps[k];
-				case "method": 	o.method = ps[k];
-				case "repeat": 	o.repeat = (ps[k]=="true") ? true : false;
-				case "active": 	o.active = (ps[k]=="true") ? true : false;
+				case E_ACTOR:		actors.add(new Actor(o.x, o.y, o.gid, o.custom.data));
 			}
 		}
 
+		else if (o.gid <= 32) 		events.add(new Event(o.x, o.y, o.gid, o.custom.data));
+
+		else trace("Warning: Object on map with GID ${o.gid} could not be matched.");
+	}
+
+	static public function e_gds(gid:Int):Array<Array<String>> {
+
+		var swi:Int; 	// swtich index
+		swi = 0;		// using an index with an eq value to check if escaped ceil bound
+
+		while (swi <= sdi) {
+
+			if (gid == s_gids[swi]) break;
+			swi++;
+		}
+
+		if (swi > sdi) return null;
+		return s_data[swi];
+	}
+
+	static public function e_pds(n:String):Array<Array<String>> {
+
+		var swi:Int; 	// swtich index
+		swi = 0;		// using an index with an eq value to check if escaped ceil bound
+		var c:Bool = false;
+
+		while (swi <= sdi) {
+
+			if (s_ets[swi] != E_PROJECTILE) {
+
+				swi++;
+				continue;
+			}
+			
+			for (p in s_data[swi][C_PROPERTIES]) if (p == 'name:$n') c = true;
+			if (c) break;
+			swi++;
+		}
+
+		if (swi > sdi) return null;
+		return s_data[swi];
 	}
 
 	static var ps:Bool = true;		// Parse Saftey, don't let script parse twice
-	static var pv:Int;	 			// Parse Level: filter, object, componant, property, value
+	static var pv:Int;	 			// Parse Level: filter, entity, component, property, value
 	static var pp:Int;				// Parse Pointer, counter for line
-	static var pl:Int;				// Parse Last, index of last entry
+	static var pl:Int;				// Parse Length, length of index array
 	static var pa:Array<String>;	// Parse Array, of lines
-	static var ta:Actor;			// Temp Actor
+	//static var ta:Actor;			// Temp Actor
 
-	static public function parseScript():Void {
+	static var s_data:Array<Array<Array<String>>>;	// Index, component, properties with values
+	static var s_ets:Array<Int>;					// Index, entity types
+	static var s_gids:Array<Int>;					// Index, GID
 
-		if (ps) return;
-		ps = false;
-
-	    pa = openfl.Assets.getText('assets/actors/script.txt').split("\n");
-	    pl = pa.length -1;
+	static var sdi:Int;		// Script Data Index pointer, keyed with script_ets and scripts_gids
+	static var sdc:Int;		// Script Data Component pointer
+	static var sdp:Int;		// Script Data Property pointer
 	
-		while (pp <= pl) {
+	public static inline var E_ACTOR			:Int = 0;	// Entity Types
+	public static inline var E_PROJECTILE		:Int = 1;
+	public static inline var E_OBSTACLE			:Int = 2;
+	public static inline var E_DECORATION		:Int = 3;
 
-			//trace('pp: $pp; pl: $pl;');
+	public static inline var C_SPRITES 			:Int = 0;	// Component types
+	public static inline var C_ANIMATIONS 		:Int = 1;
+	public static inline var C_PROPERTIES  		:Int = 2;
+	public static inline var C_STATES 			:Int = 3;
 
-			if (pv==0) {					// Filter everything through parse_filterChar
+			static inline var V_FILTER 			:Int = 0;	// Parse Level, for pv
+			static inline var V_ENTITY 			:Int = 1;
+			static inline var V_COMPONENT  		:Int = 2;
+			static inline var V_PROPERTY 		:Int = 3;
+
+	static public function parseScript(f:String):Void {
+
+		//if (ps) return;
+		//ps = false;
+
+		s_data = [];
+		s_ets = [];
+		s_gids = [];
+
+		pp = 0;
+		pv = 0;
+	    pa = openfl.Assets.getText('assets/$f').split("\n");
+	    pl = pa.length;
+
+	    sdi = -1;	// pre-increments on actors
+	
+		while (pp < pl) {
+
+			//trace('sdi:$sdi    pp:$pp    pl:$pl');
+
+			if (pv==V_FILTER) {				// Filter everything through p_filterChar
 
 				var tl:String = "";			// Temp Line
 				var tc:String;				// Temp Char
@@ -122,38 +163,190 @@ class MjE {
 				while (c < l) {
 
 					tc = pa[pp].charAt(c);
-					if (parse_filterChar(tc)) tl += tc.toLowerCase();
+					if (p_filterChar(tc)) tl += tc.toLowerCase();
 					c++;
 				}
 
-				if (pp == pl) {
+				pa[pp] = tl;
+
+				if (pp+1 == pl) {
 
 					pv++;
 					pp = 0;
+					continue;
 				}
 			}
 
 			else if (pa[pp]=="") null;		// Empty line, ignore
 
-			else if (pv==1) {				// Identify an object (actor, projectile, obstacle, decoration)
+			else if (pv==V_ENTITY) {		// Identify an entity (actor, projectile, obstacle, decoration)
 
-				//trace("pv is one");
+				if (pa[pp+1].substr(0,3)=="---" && p_entAssert(pa[pp])) {
 
-				if (pa[pp+1].substr(0,3)=="---" && parse_objectAssert(pa[pp])) {
+					sdi++;				// add new actor
+					s_data[sdi] = [];	// clear Script Data at current index
+					p_ent(pa[pp]);		// do the stuff
+					pp++; 				// skip past the hyphen line
+					pv++;				// level up
 
-					//ta = new Actor();
+					s_data[sdi][C_SPRITES] 		= [];
+					s_data[sdi][C_ANIMATIONS] 	= [];
+					s_data[sdi][C_PROPERTIES] 	= [];
+					s_data[sdi][C_STATES] 		= [];
 				}
 				
-				else parse_error("Object definition not found: have you added hyphens under it?");
+				else parse_error("Could not assert instruction [OR] Object definition invalid (have you added hyphens under it?)");
+			}
+
+			else if (pv==V_COMPONENT) {
+
+				if (p_compAssert(pa[pp])) {
+
+					p_comp(pa[pp]);			// assign current comp in SDC
+					s_data[sdi][sdc] = [];	// clear current comp
+					sdp = -1;				// reset properties pointer
+					pv++;
+				}
+
+				else if (p_entAssert(pa[pp])) {
+
+					pv--;
+					continue;
+				}
+
+				else parse_error("Component definition invalid (two dashes and either sprites, properties, etc)");
+			}
+
+			else if (pv==V_PROPERTY) {
+
+				if (p_propAssert(pa[pp])) {
+
+					 sdp++;
+					 p_prop(pa[pp]);
+				}
+
+
+				else if (p_compAssert(pa[pp]) || p_entAssert(pa[pp])) {
+
+					pv--;
+					continue;
+				}
+
+				else parse_error("Bad property/value assignment (syntax is usually \"property: value[, value, etc]\")");
 			}
 
 
 			pp++;
 		}
 
+		//trace('sdi:$sdi    pp:$pp    pl:$pl');
+
+		/*sdi = 0;
+		sdc = 0;
+		sdp = 0;
+
+		while (sdi < s_data.length) {
+	
+			trace("OBJECT");
+			trace("------");
+			trace("INDEX: " +sdi);
+
+			sdc = 0;
+
+			while (sdc < s_data[sdi].length) {
+
+				trace("COMP_" +sdc);
+
+				sdp = 0;
+
+				while (sdp < s_data[sdi][sdc].length) {
+
+					trace(" + " +s_data[sdi][sdc][sdp]);
+					sdp++;
+				}
+
+				sdc++;
+			}
+
+			sdi++;
+		}*/
+
 	}
 
-	static function parse_objectAssert(s:String):Bool {
+	static function p_prop(s:String):Void {
+
+		//trace(s);
+
+		while (pp+1!=pl && pa[pp+1].substr(0,1)==">") {
+
+			pp++;
+			s += pa[pp];
+		}
+
+		s_data[sdi][sdc][sdp] = s;
+	}
+
+	static function p_propAssert(s:String):Bool {
+
+		var ci:Int = s.indexOf(":");
+		var ss:String = s.substr(0, ci);
+
+		if (ci != -1 && ss == ss.toLowerCase()) return true;
+		return false;
+	}
+
+	static function p_comp(s:String):Void {
+
+		if 		(s.substr(2)=="sprites") 		sdc = C_SPRITES;
+		else if (s.substr(2)=="properties") 	sdc = C_PROPERTIES;
+		else if (s.substr(2)=="animations") 	sdc = C_ANIMATIONS;
+		else if (s.substr(2)=="states") 		sdc = C_STATES;
+		else parse_error("No valid componant definition found (valid are sprites, properties, animation or states)");
+	}
+
+
+	static function p_compAssert(s:String):Bool {
+
+		if (s.substr(0,2)=="##" && s.length > 2) return true;
+		return false;
+	}
+
+	static function p_ent(s:String):Void {
+
+		p_ets(pa[pp]);							// set the ent type index (is current ent actor, proj? etc)
+	
+		var sp:Int = s.length -1;				// String Pointer
+		var sc:Int = 0;							// String Catch, how many catches
+
+		while (sp >= 0) {
+
+			if (s.charAt(sp) == ",") {
+
+				sc++;
+				if (sc==1) p_gids(pa[pp], sp);	// set the GID index (used for ent map numbers)
+				else if (sc==2) null;			// ***TODO*** Add the scene to the name 
+			}
+
+			sp--;
+		}
+
+	}
+
+	static function p_gids(s:String, sp:Int):Void {
+
+		s_gids[sdi] = Std.parseInt(s.substr(++sp));
+	}
+
+	static function p_ets(s:String):Void {
+
+		if 		(s.substr(0,5) =="actor") 		s_ets[sdi] = E_ACTOR;
+		else if (s.substr(0,10)=="projectile") 	s_ets[sdi] = E_PROJECTILE;
+		else if (s.substr(0,8) =="obstacle") 	s_ets[sdi] = E_OBSTACLE;
+		else if (s.substr(0,10)=="decoration") 	s_ets[sdi] = E_DECORATION;
+		else parse_error("No valid object definition found (valid are actor, projectile, obstacle or decoration)");
+	}
+
+	static function p_entAssert(s:String):Bool {
 
 		if (s.substr(0,5) =="actor") 		return true;
 		if (s.substr(0,10)=="projectile") 	return true;
@@ -170,7 +363,7 @@ class MjE {
 		pl = 0;
 	}
 
-	static function parse_filterChar(c:String):Bool {
+	static function p_filterChar(c:String):Bool {
 
 		var cc:Int = c.charCodeAt(0);
 
